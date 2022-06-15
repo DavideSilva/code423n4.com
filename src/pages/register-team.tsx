@@ -93,13 +93,6 @@ export default function TeamRegistration({ data }) {
               <div className="centered-text">
                 <h1>Thank you!</h1>
                 <p>Your registration application has been submitted.</p>
-                <h2>One more thing...</h2>
-                <p>
-                  Before we can complete your registration, please join us in{" "}
-                  <a href="https://discord.gg/code4rena">Discord</a> and give us
-                  a howl in #i-want-to-be-a-warden! <br />
-                  We look forward to seeing you in the arena!
-                </p>
               </div>
             )}
           </div>

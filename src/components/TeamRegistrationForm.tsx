@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useRef } from "react";
 import clsx from "clsx";
+import { useMoralis } from "react-moralis";
 
 import useUser from "../hooks/UserContext";
 
@@ -52,11 +53,14 @@ export default function TeamRegistrationForm({
   className,
 }) {
   const { currentUser } = useUser();
+  const { user, isInitialized } = useMoralis();
+
   const [state, setState] = useState(initialState);
   const [hasValidationErrors, setHasValidationErrors] = useState(false);
   const [teamMembers, setTeamMembers] = useState<
     { value: string; image: string }[]
   >([wardens.find((warden) => warden.value === currentUser.username)]);
+
   const avatarInputRef = useRef<HTMLInputElement>();
 
   const handleChange = useCallback(
@@ -94,7 +98,7 @@ export default function TeamRegistrationForm({
 
   const submitRegistration = useCallback((): void => {
     const url = `/.netlify/functions/register-team`;
-    if (!currentUser.isLoggedIn) {
+    if (!currentUser.isLoggedIn || !user || !isInitialized) {
       navigate("/");
     }
 
@@ -121,16 +125,20 @@ export default function TeamRegistrationForm({
 
         const requestBody = {
           teamName: state.teamName,
+          username: currentUser.username,
           members,
           link: state.link,
           image,
           address: state.polygonAddress,
         };
 
+        const sessionToken = user.attributes.sessionToken;
+
         const response = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "X-Authorization": `Bearer ${sessionToken}`,
           },
           body: JSON.stringify(requestBody),
         });
@@ -155,6 +163,8 @@ export default function TeamRegistrationForm({
     currentUser,
     teamMembers,
     handles,
+    user,
+    isInitialized,
   ]);
 
   return (
